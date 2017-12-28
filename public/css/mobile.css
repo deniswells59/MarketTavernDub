@@ -1,0 +1,55 @@
+@media (max-width: 500px) {
+  img.logo {
+    min-width: 300px;
+  }
+}
+@media (max-width: 767px) {
+  .info-box {
+    width: 90vw !important;
+    padding: 1.5em 0 3em;
+  }
+  .hr-vert {
+    display: none;
+  }
+  ul.nav.navbar-nav {
+    float: left;
+  }
+  div.container-fluid.info-wrapper {
+    height: 240px;
+  }
+  .container-fluid.wood-panels {
+    padding: 4em 0 8em;
+  }
+  button.gallery-button.btn {
+    width: 85%;
+    margin: 10px .5em;
+  }
+  .gallery .col-md-6.chalk {
+    padding: 3em 0;
+  }
+  .row.gallery {
+    margin: 0 1em;
+  }
+}
+@media (max-width: 992px) {
+  .hidden-lg {
+    display: block;
+  }
+  .hidden-xs {
+    display: none;
+  }
+  .grid-square.grid-1,
+  .grid-square.grid-2 {
+    max-height: 200px;
+  }
+  .yelp-info-wrapper {
+    width: 180px;
+    left: 46%;
+  }
+  .yelp-wrapper {
+    width: 300px;
+  }
+  .outer-button#catering {
+    width: 80%;
+  }
+}
