@@ -15,7 +15,7 @@
     float: left;
   }
   div.container-fluid.info-wrapper {
-    height: 240px;
+    /* height: 240px; */
   }
   .container-fluid.wood-panels {
     padding: 4em 0 8em;

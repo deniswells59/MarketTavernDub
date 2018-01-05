@@ -10,6 +10,7 @@
   const RIGHT           = $('.icon-right-open-big');
 
   let scroll = new SmoothScroll('a[href*="#"]');
+  let headers = [];
   let galleryState = {
     page: 0,
     label: 'kitchen'
@@ -41,9 +42,10 @@
   }
 
   function initResponsive() {
-    galleryPrevSize();
+    window.addEventListener('resize', setMidWidth);
 
-    window.addEventListener('resize', galleryPrevSize, true);
+    // galleryPrevSize();
+    // window.addEventListener('resize', galleryPrevSize, true);
   }
 
   function initScrollAnimations() {
@@ -51,8 +53,8 @@
     animate(document.getElementById('logo'), 'fadeIn');
     animate(document.getElementById('header-buttons'), 'fadeIn');
 
-    iterateObject(document.getElementsByClassName('about-wrapper'), addFadeInAnimation);
     iterateObject(document.getElementsByClassName('outer-button'), addFadeInAnimation);
+    iterateObject(document.getElementsByClassName('about-wrapper'), addFadeInAnimation);
   }
 
   function addFadeInAnimation(el) {
@@ -150,19 +152,60 @@
   }
 
 
-  function BackgroundLoader(url, seconds, success) {
-    let image = new Image();
+  function BackgroundLoader(opts) {
+    headers.push(opts);
 
-    image.onload = function () {
-      let div    = document.getElementById('home');
-      let loader = document.getElementById('loader');
-      div.style.backgroundImage = "url('" + url + "')";
-      loader.setAttribute('class', 'loading loaded');
-      setTimeout(() => loader.remove(), 250);
+    return new Promise(function(resolve, reject) {
+      let image = new Image();
 
-      initScrollAnimations();
+      image.onload = function () {
+        if(opts.last) {
+          let loader = document.getElementById('loader');
+          loader.setAttribute('class', 'loading loaded');
+
+          initScrollAnimations();
+          showImages(headers);
+          setTimeout(() => loader.remove(), 250);
+        }
+
+        addHeaderImg({ class: opts.class, src: opts.src }, opts.timeout);
+        resolve();
+      }
+
+      image.src = opts.src;
+    });
+  }
+
+  function setMidWidth() {
+    let windowWidth = $(window).width();
+    if(windowWidth > 1275) {
+      let style = `width: ${windowWidth * 0.4 - 12}px;`;
+      $('.mid').attr({ style });
     }
-    image.src = url;
+  }
+
+  function addHeaderImg(info, timeout) {
+    let div = document.getElementById('home');
+    let img = $('<img>')[0];
+
+    $(img).attr(info);
+    div.append(img);
+
+    setMidWidth();
+  }
+
+  function showImages(arr) {
+    arr.map(i => {
+      setTimeout(() => $(`img.${i.class}`).addClass('appear'), i.timeout);
+    });
+
+    removeHeaderTransitions(arr[arr.length - 1].timeout);
+  }
+
+  function removeHeaderTransitions(timeout) {
+    setTimeout(function () {
+      $('div.header-img-col img').addClass('notransition');
+    }, timeout * 4);
   }
 
   function parallax(id, offset) {
@@ -230,7 +273,30 @@
     // })
   }
 
-  BackgroundLoader('/assets/header.jpg', 1)
+  function initLargeHeader() {
+    BackgroundLoader({
+      class: 'right',
+      src: '/assets/header-dub-left.png',
+      timeout: 300
+    })
+    .then(() => {
+      return BackgroundLoader({
+        class: 'mid',
+        src: '/assets/header-dub-middle.png',
+        timeout: 400,
+      })
+    })
+    .then(() => {
+      return BackgroundLoader({
+        class: 'left',
+        src: '/assets/header-dub-right.png',
+        timeout: 480,
+        last: true
+      })
+    })
+  }
+
+  initLargeHeader();
   initResponsive();
   initGallery('kitchen', 0);
 })();
