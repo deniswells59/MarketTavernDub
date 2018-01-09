@@ -2,12 +2,12 @@
   img.logo {
     min-width: 300px;
   }
-}
-@media (max-width: 767px) {
   .info-box {
     width: 90vw !important;
     padding: 1.5em 0 3em;
   }
+}
+@media (max-width: 767px) {
   .hr-vert {
     display: none;
   }

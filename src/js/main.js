@@ -4,10 +4,11 @@
 // require('./bootstrap.min.js');
 
 (function() {
-  const GALLERY_BUTTONS = $('.gallery-button');
+  // const GALLERY_BUTTONS = $('.gallery-button');
   const FORM            = $('#career-form');
-  const LEFT            = $('.icon-left-open-big');
-  const RIGHT           = $('.icon-right-open-big');
+  const LOAD            = $('#load');
+  // const LEFT            = $('.icon-left-open-big');
+  // const RIGHT           = $('.icon-right-open-big');
 
   let scroll = new SmoothScroll('a[href*="#"]');
   let headers = [];
@@ -15,15 +16,12 @@
     page: 0,
     label: 'kitchen'
   };
-  let gallery = {
-    'kitchen': [9, 2, 22, 10, 4, 1, 12, 21, 11, 23, 3, 24],
-    'bar'    : [5, 7, 16, 8, 13, 6, 15, 14],
-    'market' : [17, 20, 19, 18],
-  };
+  let galleryStop  = -5;
+  let galleryLimit = 24;
+  let animatingGallery = false;
 
-  $(LEFT).click(prevGallery);
-  $(RIGHT).click(nextGallery);
-  $(GALLERY_BUTTONS).click(changeGallery);
+  $(LOAD).click($(window).width() < 769 ? initGalleryMobile : initGallery);
+  // $(GALLERY_BUTTONS).click(changeGallery);
   $(FORM).submit(formSubmit);
 
   function galleryPrevSize() {
@@ -55,19 +53,21 @@
 
     iterateObject(document.getElementsByClassName('outer-button'), addFadeInAnimation);
     iterateObject(document.getElementsByClassName('about-wrapper'), addFadeInAnimation);
+    iterateObjectWithTimeout(document.getElementsByClassName('gallery-prev'), addFadeInAnimation);
   }
 
-  function addFadeInAnimation(el) {
-    animate(el, 'fadeInUp')
+  function addFadeInAnimation(opts) {
+    animate(opts.el, 'fadeInUp', opts.timeout || 0);
   }
 
-  function animate(el, animation) {
+  function animate(el, animation, timeout) {
 
     el.scrollEvent = function() {
       if(isScrolledIntoView(el)){
         let currentClass = el.getAttribute('class');
         let newClass     = `${currentClass} animated ${animation}`;
-        el.setAttribute('class', newClass);
+
+        setTimeout(() => el.setAttribute('class', newClass), timeout || 0);
         window.removeEventListener('scroll', el.scrollEvent);
       }
     }
@@ -76,29 +76,84 @@
     el.scrollEvent();
   }
 
-  function initGallery(label, page) {
-    if(['kitchen', 'bar', 'market'].indexOf(label) < 0) return;
+  function initGallery() {
+    if(animatingGallery) return;
+    animatingGallery = true;
 
-    let gall = gallery[label];
-    if(!gall || gall.length < 4) return;
+    let firstload = false;
+    if(galleryStop < 0) firstload = true;
 
-    let nums = getGallery(page, gall);
+    galleryStop += 6;
+    if(galleryStop > galleryLimit) galleryStop = 1;
 
     $('.gallery-prev').each((idx, div) => {
-      let a    = $(div).find('a');
-      let prev = $(a).children()[0];
-      let url  = '/assets/gallery/gallery-';
+      let a      = $(div).find('a');
+      let prev   = $(a).children()[0];
+      let url    = '/assets/gallery/gallery-';
+      let imgNum = galleryStop + idx;
 
-      $(a).attr('href', `${url}${nums[idx]}.png`);
-      $(prev).css({
-        'background-image': `url(${url}${nums[idx]}-prev.png)`
-      });
+      if(!firstload) {
+        $(div).removeClass('fadeInUp fadeOut').addClass('fadeOut');
+        setTimeout(showNewImage, 650);
+      } else {
+        showNewImage();
+      }
+
+      function showNewImage() {
+        $(a).attr('href', `${url}${imgNum}.png`);
+        $(prev).css({
+          'background-image': `url(${url}${imgNum}-prev.png)`
+        });
+
+        if(!firstload) {
+          setTimeout(() => {
+            $(div).removeClass('fadeOut fadeInUp').addClass('fadeInUp');
+          }, 150 * idx);
+        }
+
+        setTimeout(() => animatingGallery = false, 1250);
+      }
     });
 
     baguetteBox.run('.gallery', {
       buttons: false,
       captions: false,
     });
+  }
+
+  function initGalleryMobile() {
+    if(animatingGallery) return;
+    animatingGallery = true;
+
+    // let firstload = false;
+    // if(galleryStop < 0) firstload = true;
+
+    galleryStop += 6;
+    if(galleryStop > galleryLimit) {
+      $(LOAD).attr({ disabled: true });
+      return;
+    };
+
+    let height = $('.gallery').height();
+    $('.gallery').css({ minHeight: height + 600 });
+
+    setTimeout(() => {
+      for(var i = 0; i < 6; i++) {
+        let div    = $('.gallery-prev').clone()[0];
+        let a      = $(div).find('a');
+        let prev   = $(a).children()[0];
+        let url    = '/assets/gallery/gallery-';
+        let imgNum = galleryStop + i;
+
+        $(a).attr('href', `${url}${imgNum}.png`);
+        $(prev).css({
+          'background-image': `url(${url}${imgNum}-prev.png)`
+        });
+
+        $('.gallery-grid').append(div);
+        animatingGallery = false;
+      }
+    }, 200);
   }
 
   function getGallery(page, nums) {
@@ -114,18 +169,18 @@
     return numsToReturn;
   }
 
-  function nextGallery() {
-    galleryState.page += 1;
-    initGallery(galleryState.label, galleryState.page);
-  }
-
-  function prevGallery() {
-    galleryState.page -= 1;
-
-    if(galleryState.page < 0) galleryState.page = 0;
-    initGallery(galleryState.label, galleryState.page);
-  }
-
+  // function nextGallery() {
+  //   galleryState.page += 1;
+  //   initGallery(galleryState.label, galleryState.page);
+  // }
+  //
+  // function prevGallery() {
+  //   galleryState.page -= 1;
+  //
+  //   if(galleryState.page < 0) galleryState.page = 0;
+  //   initGallery(galleryState.label, galleryState.page);
+  // }
+  //
   function changeGallery() {
     $(GALLERY_BUTTONS).each((i, b) => $(b).removeClass('active'));
     $(this).addClass('active');
@@ -138,7 +193,20 @@
   function iterateObject(obj, func) {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {
-        func(obj[key]);
+        let opts = { el: obj[key] };
+        func(opts);
+      }
+    }
+  }
+
+  function iterateObjectWithTimeout(obj, func) {
+    let i = 0;
+
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        let opts = { el: obj[key], timeout: i * 150 };
+        func(opts);
+        i++;
       }
     }
   }
@@ -298,5 +366,5 @@
 
   initLargeHeader();
   initResponsive();
-  initGallery('kitchen', 0);
+  initGallery();
 })();
