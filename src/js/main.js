@@ -1,14 +1,7 @@
-// import $ from 'jquery';
-//
-// require('./yelp.min.js');
-// require('./bootstrap.min.js');
-
 (function() {
-  // const GALLERY_BUTTONS = $('.gallery-button');
-  const FORM            = $('#career-form');
-  const LOAD            = $('#load');
-  // const LEFT            = $('.icon-left-open-big');
-  // const RIGHT           = $('.icon-right-open-big');
+  const FORM   = $('#career-form');
+  const SUBMIT = $('#submit');
+  const LOAD   = $('#load');
 
   let scroll = new SmoothScroll('a[href*="#"]');
   let headers = [];
@@ -21,7 +14,6 @@
   let animatingGallery = false;
 
   $(LOAD).click($(window).width() < 769 ? initGalleryMobile : initGallery);
-  // $(GALLERY_BUTTONS).click(changeGallery);
   $(FORM).submit(formSubmit);
 
   function galleryPrevSize() {
@@ -41,13 +33,10 @@
 
   function initResponsive() {
     window.addEventListener('resize', setMidWidth);
-
-    // galleryPrevSize();
-    // window.addEventListener('resize', galleryPrevSize, true);
   }
 
   function initScrollAnimations() {
-    animate(document.getElementById('info-box'), 'fadeInUp');
+    animate(document.getElementById('info-box'), 'fadeInUp', 1000);
     animate(document.getElementById('logo'), 'fadeIn');
     animate(document.getElementById('header-buttons'), 'fadeIn');
 
@@ -57,7 +46,7 @@
   }
 
   function addFadeInAnimation(opts) {
-    animate(opts.el, 'fadeInUp', opts.timeout || 0);
+    animate(opts.el, 'fadeInUpCustom', opts.timeout || 0);
   }
 
   function animate(el, animation, timeout) {
@@ -93,7 +82,7 @@
       let imgNum = galleryStop + idx;
 
       if(!firstload) {
-        $(div).removeClass('fadeInUp fadeOut').addClass('fadeOut');
+        $(div).removeClass('fadeInUpCustom fadeOut').addClass('fadeOut');
         setTimeout(showNewImage, 650);
       } else {
         showNewImage();
@@ -102,12 +91,12 @@
       function showNewImage() {
         $(a).attr('href', `${url}${imgNum}.png`);
         $(prev).css({
-          'background-image': `url(${url}${imgNum}-prev.png)`
+          'background-image': `url(${url}${imgNum}-prev.jpg)`
         });
 
         if(!firstload) {
           setTimeout(() => {
-            $(div).removeClass('fadeOut fadeInUp').addClass('fadeInUp');
+            $(div).removeClass('fadeOut fadeInUpCustom').addClass('fadeInUpCustom');
           }, 150 * idx);
         }
 
@@ -124,9 +113,6 @@
   function initGalleryMobile() {
     if(animatingGallery) return;
     animatingGallery = true;
-
-    // let firstload = false;
-    // if(galleryStop < 0) firstload = true;
 
     galleryStop += 6;
     if(galleryStop > galleryLimit) {
@@ -169,18 +155,6 @@
     return numsToReturn;
   }
 
-  // function nextGallery() {
-  //   galleryState.page += 1;
-  //   initGallery(galleryState.label, galleryState.page);
-  // }
-  //
-  // function prevGallery() {
-  //   galleryState.page -= 1;
-  //
-  //   if(galleryState.page < 0) galleryState.page = 0;
-  //   initGallery(galleryState.label, galleryState.page);
-  // }
-  //
   function changeGallery() {
     $(GALLERY_BUTTONS).each((i, b) => $(b).removeClass('active'));
     $(this).addClass('active');
@@ -236,7 +210,9 @@
           setTimeout(() => loader.remove(), 250);
         }
 
-        addHeaderImg({ class: opts.class, src: opts.src }, opts.timeout);
+        if(opts.class !== 'mobile') {
+          addHeaderImg({ class: opts.class, src: opts.src }, opts.timeout);
+        }
         resolve();
       }
 
@@ -301,11 +277,19 @@
     });
   }
 
+  function disableSubmit() {
+    $(SUBMIT).attr({ disabled: true });
+  }
+  function enableSubmit() {
+    $(SUBMIT).attr({ disabled: false });
+  }
+
   function formSubmit(e) {
     e.preventDefault();
+    disableSubmit();
 
     $(FORM).children().each((e, el) => {
-      if(!$(el).val()) return;
+      if(!$(el).val()) return enableSubmit();
     });
 
     grecaptcha.execute(); // Goes to get captcha
@@ -324,9 +308,8 @@
     })
     .then(data => { return data.json() })
     .then(res => {
-      if(res.verified) {
-        sendEmail();
-      }
+      if(!res.verified) return enableSubmit();
+      sendEmail();
     })
     .catch(err => {
       console.log('ERROR:', err);
@@ -334,11 +317,11 @@
   }
 
   function sendEmail() {
-    // emailjs.send('postmark', 'market_tavern_careers', {
-    //   'name': document.getElementById('name').value,
-    //   'email':document.getElementById('email').value,
-    //   'phone':document.getElementById('phone').value
-    // })
+    emailjs.send('postmark', 'market_tavern_dub_careers', {
+      'name': document.getElementById('name').value,
+      'email':document.getElementById('email').value,
+      'phone':document.getElementById('phone').value
+    })
   }
 
   function initLargeHeader() {
@@ -363,8 +346,20 @@
       })
     })
   }
+  function initSmallHeader() {
+    BackgroundLoader({
+        class:'mobile',
+        src: '/assets/small-header.jpg',
+        last: true,
+        timeout: 300
+      })
+  }
 
-  initLargeHeader();
+  if($(window).width() > 1276) {
+    initLargeHeader();
+  } else {
+    initSmallHeader();
+  }
   initResponsive();
   initGallery();
 })();

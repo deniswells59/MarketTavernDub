@@ -119,7 +119,7 @@ img.right, img.left {
 img.mid {
   margin: 0 6px;
 }
-img.right, img.left, img.mid {
+img.right, img.left, img.mid, img.mobile {
   opacity: 0;
   display: inline;
   transform: translateY(55px);
@@ -128,7 +128,7 @@ img.right, img.left, img.mid {
   -o-transition: all 1s ease-out;
   transition: all 1s ease-out;
 }
-img.right.appear, img.left.appear, img.mid.appear {
+img.right.appear, img.left.appear, img.mid.appear, img.mobile.appear {
   transform: translateY(0px);
   opacity: 1;
 }
@@ -137,7 +137,7 @@ img.right.appear, img.left.appear, img.mid.appear {
     display: none;
   }
   div.header-img-col {
-    background: url('/assets/small-header.png');
+    background: url('/assets/small-header.jpg');
     background-size: cover;
     background-position: 50% 50%;
     max-height: 877px;
@@ -201,6 +201,14 @@ div.info-box {
 }
 .info-box a {
   color: #ffc20e;
+  -webkit-transition: all .2s ease-out;
+  -moz-transition:    all .2s ease-out;
+  -o-transition:      all .2s ease-out;
+  transition:         all .2s ease-out;
+}
+.info-box a:hover {
+  text-decoration: none;
+  color: #fff;
 }
 .split-info {
   width: 330px;
@@ -262,6 +270,14 @@ h2.info-title {
   right:0;
   color: #fcfcfc;
   font-family: 'Lato', sans-serif;
+  -webkit-transition: all .2s ease-out;
+  -moz-transition:    all .2s ease-out;
+  -o-transition:      all .2s ease-out;
+  transition:         all .2s ease-out;
+}
+.split-sides p.right:hover a,
+.split-sides p.right a:hover {
+  color: #bfbfbf;
 }
 .split-sides p.left {
   left:0;
@@ -452,7 +468,7 @@ img.tmp-open-table {
   box-shadow: 0px 1px 6px -1px rgba(0, 0, 0, 0.75);
 }
 .grid-square.grid-1 {
-  background: url('/assets/grid-1.png');
+  background: url('/assets/grid-1.jpg');
   background-size: cover;
   background-position: 50% 50%;
 }
@@ -467,7 +483,7 @@ img.tmp-open-table {
   background-position: 50% 50%;
 }
 .grid-square {
-  height: 540px;
+  height: 580px;
 }
 svg.trapezoid.left.top {
   top: -10em;
@@ -555,6 +571,10 @@ input[type="submit"], button#load {
 }
 input[type="submit"]:hover, button#load:hover {
   color: #fff;
+  border-color: #2a2a2a;
+}
+input#submit[disabled] {
+  opacity: 0.6;
 }
 #gallery hr {
   width: 50px;
@@ -838,4 +858,11 @@ p.title-center.soon {
   -moz-transition: none !important;
   -o-transition: none !important;
   transition: none !important;
+}
+.legal {
+  font-size: 1em;
+  font-family: 'Lato';
+  margin-top: 2em;
+  text-align: center;
+  color: #ffc20e;
 }

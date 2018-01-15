@@ -1,10 +1,23 @@
 @media (max-width: 500px) {
   img.logo {
-    min-width: 300px;
+    min-width: 350px;
   }
   .info-box {
     width: 90vw !important;
     padding: 1.5em 0 3em;
+  }
+}
+@media (max-width: 350px) {
+  img.logo {
+    min-width: 100%;
+  }
+  .split-info {
+    width: 98%;
+  }
+  .split-sides {
+    width: 270px;
+    margin-left: 5px;
+    margin-right: 5px;
   }
 }
 @media (max-width: 767px) {

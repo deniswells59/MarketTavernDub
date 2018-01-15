@@ -682,6 +682,22 @@
   animation-name: fadeInUp;
 }
 
+@keyframes fadeInUpCustom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fadeInUpCustom {
+  animation-name: fadeInUpCustom;
+}
+
 @keyframes fadeInUpBig {
   from {
     opacity: 0;
